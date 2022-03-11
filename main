@@ -80,6 +80,16 @@ class StickMan2 : public Shape {
         {n,ch,n,ch,n},
         {n,ch,n,ch,n}
         };
+        char graphic_squat2[8][5]={
+        {n,n,n,n,n},
+        {n,n,n,n,n},
+        {n,n,n,n,n},
+        {n,n,n,n,n},
+        {ch,ch,ch,ch,ch},
+        {n,n,ch,n,n},
+        {n,ch,n,ch,n},
+        {n,ch,n,ch,n},
+        };
         char graphic_jump[8][5]={
         {n,n,ch,n,n},
         {ch,n,ch,n,ch},
@@ -92,7 +102,6 @@ class StickMan2 : public Shape {
         };
 
         virtual void animateObject(bool is_falling, bool squat) {
-
             if(is_falling) {
                 for(int i=0;i<8;i++) {
                     for(int j=0;j<5;j++) {
@@ -165,7 +174,7 @@ class Obstacle {
 
 void displayScreen() {
     string buffer;
-
+    cout<<"Use WSAD";
     for(int i=0;i<screen_height+1;i++)
         cout<<"\e[F";
         //cout << "\x1b[A";
@@ -179,16 +188,15 @@ void displayScreen() {
 
 bool collisionFloor(Shape shape) {
     for(int i=0;i<shape.width;i++) {
-        if(screen[shape.y+shape.height][shape.x+i]==n);
-        else return false;
+        if(screen[shape.y+shape.height][shape.x+i]!=n)return false;
     } return true;
 }
 bool collisionRoof(Shape shape) {
     for(int j=shape.delta;j>=0;j--) {
         for(int i=0;i<shape.width;i++) {
             if(screen[shape.y+j-1][shape.x+i]!=n) return true;
-        } return false;
-    }
+        }
+    } return false;
 }
 bool collisionRight(Shape shape) {
     for(int i=shape.height-1;i>=shape.delta;i--) {
@@ -239,10 +247,13 @@ int main()
     }
 
     Rect r01(4,18,5,1);
-    Rect r02(10,17,3,1);
+    Rect r02(10,19,3,1);
     StickMan2 p1(5,5);
 
     Player player(&p1);
+
+    Rect r3(8,23,2,2);
+    Obstacle o1(&r3);
 
     clearScreen();
     while(!(GetKeyState(VK_ESCAPE) & 0x8000)) {//Finish when "Esc" is pressed
@@ -269,7 +280,11 @@ int main()
 
         //draw things
         r01.drawObject();
-        //r02.drawObject();
+        r02.drawObject();
+
+        if(o1.shape->x<=0) o1.shape->x=24;
+        if(frame>0&&frame%4==0) o1.shape->x--;
+        o1.drawObject();
 
         if(collisionRoof(*player.shape)) player.can_jump=false;
         else player.can_jump=true;
